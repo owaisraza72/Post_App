@@ -64,18 +64,23 @@ if (signupform) {
       Swal.fire("Error", insertError.message, "error");
       return;
     }
+    else {
+      Swal.fire(
+        "Success! Signed up ",
+        "You have signed up successfully! Please check your Email"
+      );
 
-    Swal.fire(
-      "Success! Signed up ",
-      "You have signed up successfully! Please check your Email"
-    );
+      username.value = "";
+      useremail.value = "";
+      userpassword.value = "";
 
-    username.value = "";
-    useremail.value = "";
-    userpassword.value = "";
+      loginPage()
+    }
     // After everything
     hideLoader(); //  Hide loader
+
   });
+
 }
 // ======================================= Login Handler ======================================================================
 if (loginform) {
@@ -107,6 +112,12 @@ function showLoader() {
 function hideLoader() {
   document.getElementById("loader").style.display = "none";
 }
+
+function loginPage() {
+  window.location.href = "index.html"
+}
+
+
 
 // ======================================= Logout Handler =====================================================================
 
@@ -216,9 +227,8 @@ if (editLogo) {
         return;
       }
 
-      const fileName = `profileLogo/${session.user.id}-${Date.now()}-${
-        file.name
-      }`;
+      const fileName = `profileLogo/${session.user.id}-${Date.now()}-${file.name
+        }`;
 
       const { error: uploadError } = await client.storage
         .from("postapp")
@@ -272,19 +282,27 @@ async function fetchLogo() {
   }
 
   let logo = userData.logo_file;
-
-  // frontend image changed
-  const logoImg = document.getElementById("profilePicture");
-  logoImg ? (logoImg.src = logo) : console.log(logo);
+  // let defaultLogo = document.getElementById("defaultLogo").style.display = "block";
 
   const userAvatar = document.getElementById("userAvatar");
-  if (userAvatar) {
-    userAvatar.src = logo;
-  } else {
-    console.log("error");
+  if (logo) {
+    defaultLogo.style.display = "none";
   }
+  else {
+    defaultLogo.style.display = "block";
+
+    userAvatar.innerHTML = `<img src="${logo}">`
+  }
+
+
   console.log(userAvatar);
 }
+// frontend image changed
+const logoImg = document.getElementById("profilePicture");
+logoImg ? (logoImg.src = logo) : console.log(logo);
+
+
+
 
 fetchLogo();
 
