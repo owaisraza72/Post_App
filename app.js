@@ -11,6 +11,7 @@ const loginform = document.getElementById("loginForm");
 const username = document.getElementById("username");
 const useremail = document.getElementById("email");
 const userpassword = document.getElementById("password");
+const userLogo = document.getElementById("fileLogo");
 
 const loginemail = document.getElementById("loginemail");
 const loginpassword = document.getElementById("loginpassword");
@@ -26,7 +27,11 @@ let image = document.getElementById("image");
 
 const postTitle = document.getElementById("postTitle");
 const postContent = document.getElementById("postContent");
+
 let postShow = document.getElementById("postsContainer");
+let postFeed = document.getElementById("post-feed");
+
+let editLogo = document.getElementById("editLogo");
 // ======================================= Sign Up Handler ====================================================================
 if (signupform) {
   signupform.addEventListener("submit", async (e) => {
@@ -121,6 +126,168 @@ if (logoutBtn) {
   });
 }
 
+async function checkAuth() {
+  const {
+    data: { session },
+  } = await client.auth.getSession();
+  const currentPage = window.location.pathname.split("/").pop();
+
+  if (!session && currentPage === "dashboard.html") {
+    window.location.href = "index.html";
+  }
+}
+
+const currentPage = window.location.pathname.split("/").pop();
+if (currentPage === "dashboard.html" || currentPage === "index.html") {
+  checkAuth();
+}
+
+async function userProfile() {
+  const {
+    data: { session },
+    error,
+  } = await client.auth.getSession();
+
+  if (error) {
+    console.error("Error getting session:", error.message);
+    return;
+  }
+
+  // console.log("User email:", session.user.email);
+
+  // Get user details from Instagram table
+  const { data: userData, error: userError } = await client
+    .from("Instagram")
+    .select("*")
+    .eq("email", session.user.email)
+    .single();
+
+  if (userError) {
+    console.error("Error fetching user data:", userError.message);
+    return;
+  }
+
+  // console.log("User data:", userData);
+
+  // Update navigation bar
+  userName.textContent = userData.user_name;
+
+  // Update profile section
+  document.getElementById("profileName").textContent = userData.user_name;
+
+  // Get user's post count
+  const { count: postCount, error: postError } = await client
+    .from("post_app")
+    .select("*", { count: "exact" })
+    .eq("email", session.user.email);
+
+  if (!postError) {
+    document.getElementById("postCount").textContent = postCount;
+  }
+
+  // You can add avatar/image update logic here when you implement profile pictures
+}
+
+// Call the function when page loads
+document.addEventListener("DOMContentLoaded", userProfile);
+
+// ========================================== Supabase editLogo =============================================
+
+if (editLogo) {
+  editLogo.addEventListener("click", async () => {
+    // alert("ok")
+    // file input create karke click hwa
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "image/*";
+    fileInput.click();
+
+    fileInput.onchange = async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      // current logged in user ka session lya h
+      const {
+        data: { session },
+        error: sessionError,
+      } = await client.auth.getSession();
+      if (sessionError || !session) {
+        Swal.fire("Error", "Please login first", "error");
+        return;
+      }
+
+      const fileName = `profileLogo/${session.user.id}-${Date.now()}-${
+        file.name
+      }`;
+
+      const { error: uploadError } = await client.storage
+        .from("postapp")
+        .upload(fileName, file, { upsert: true });
+
+      if (uploadError) {
+        Swal.fire("Error", "Upload failed", "error");
+        return;
+      }
+
+      // public URL
+      const { data: publicData } = client.storage
+        .from("postapp")
+        .getPublicUrl(fileName);
+      const publicUrl = publicData.publicUrl;
+
+      const { error: updateError } = await client
+        .from("Instagram")
+        .update({ logo_file: publicUrl })
+        .eq("id", session.user.id);
+
+      if (updateError) {
+        Swal.fire("Error", "Database update failed", "error");
+        return;
+      }
+      Swal.fire("Success!", "Profile logo updated!", "success");
+    };
+  });
+}
+
+async function fetchLogo() {
+  const {
+    data: { session },
+    error,
+  } = await client.auth.getSession();
+
+  if (error) {
+    console.error("Error getting session:", error.message);
+    return;
+  }
+  // Get user details from Instagram table
+  const { data: userData, error: userError } = await client
+    .from("Instagram")
+    .select("*")
+    .eq("email", session.user.email)
+    .single();
+
+  if (userError) {
+    console.error("Error fetching user data:", userError.message);
+    return;
+  }
+
+  let logo = userData.logo_file;
+
+  // frontend image changed
+  const logoImg = document.getElementById("profilePicture");
+  logoImg ? (logoImg.src = logo) : console.log(logo);
+
+  const userAvatar = document.getElementById("userAvatar");
+  if (userAvatar) {
+    userAvatar.src = logo;
+  } else {
+    console.log("error");
+  }
+  console.log(userAvatar);
+}
+
+fetchLogo();
+
 if (createPostBtn) {
   createPostBtn.addEventListener("click", function () {
     postForm.classList.toggle("hidden");
@@ -129,22 +296,19 @@ if (createPostBtn) {
   submitPostBtn.addEventListener("click", async function () {
     // Get current user from Supabase Auth
     const {
-      data: { user },
+      data: { session },
       error,
-    } = await client.auth.getUser();
-
-    if (error || !user) {
-      Swal.fire("Error", "❌ User not found or not logged in", "error");
-      return;
-    }
+    } = await client.auth.getSession();
 
     let file = image.files[0];
     if (!file) {
       Swal.fire("Please select an image file.");
       return;
     }
+    let userSession = session.user;
+    console.log(userSession);
 
-    let filePath = `public/${file.name}`;
+    let filePath = `public/${userSession.id}${Date.now()}`;
 
     // Upload to Supabase Storage
     const { data: uploadedFile, error: uploadError } = await client.storage
@@ -165,7 +329,7 @@ if (createPostBtn) {
 
     // Insert post into Supabase DB
     const { error: insertError } = await client.from("post_app").insert({
-      email: user.email,
+      email: userSession.email,
       file: fileUrl,
       post_title: postTitle.value,
       post_content: postContent.value,
@@ -191,16 +355,25 @@ if (createPostBtn) {
 
 // Show all posts
 async function show() {
-  const { data, error } = await client.from("post_app").select("*").eq("email", user.email);
+  const {
+    data: { session },
+    error,
+  } = await client.auth.getSession();
+  // console.log(session.user.user_metadata.email);
 
-  if (error) {
+  const { data: updatData, error: updatError } = await client
+    .from("post_app")
+    .select("*")
+    .eq("email", session.user.user_metadata.email);
+
+  if (updatError) {
     Swal.fire("Error", error.message, "error");
     return;
   }
 
   postShow.innerHTML = ""; // Clear old posts
 
-  data.forEach((element) => {
+  updatData.forEach((element) => {
     postShow.innerHTML += `
       <div class="post-card">
         <img src="${element.file}" alt="Post Image">
@@ -211,3 +384,26 @@ async function show() {
   });
 }
 show();
+
+async function renderPost() {
+  const { data: updatData, error: updatError } = await client
+    .from("post_app")
+    .select("*");
+
+  updatError
+    ? Swal.fire("Error", error.message, "error")
+    : console.log("updatData");
+
+  postFeed.innerHTML = ""; // Clear old posts
+
+  updatData.forEach((element) => {
+    postFeed.innerHTML += `
+     <div class="post-card">
+     <img src="${element.file}" alt="Post Image">
+     <h3>${element.post_title}</h3>
+     <p>${element.post_content}</p>
+     <span>Posted by: ${element.email}</span>
+     </div>`;
+  });
+}
+renderPost();

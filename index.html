@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Post App - Home</title>
+    <title>Login - Post App</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 </head>
 <body>
-    <!-- Navbar -->
-    <header>
-        <nav>
-            <div class="logo">Post App</div>
-            <a href="login.html" id="loginBtn" class="login-btn">Login</a>
-        </nav>
-    </header>
+    <div class="login-container">
+        <h2>Welcome Back</h2>
+        <form id="loginForm">
+            <input type="email" id="loginemail" placeholder="Email" required />
+            <input type="password" id="loginpassword" placeholder="Password" required />
+            <button type="submit">Login</button>
+        </form>
+        <div class="divider">or</div>
+        <button id="facebookBtn" class="social-login-btn">
+            <i class="fab fa-facebook-f"></i> Continue with Facebook
+        </button>
+        <button id="googleBtn" class="social-login-btn">
+            <i class="fab fa-google"></i> Continue with Google
+        </button>
+        <p class="mt-2">Don't have an account? <a href="signup.html">Sign Up</a></p>
+    </div>
 
-    <!-- Post Feed -->
-    <main id="mainContent">
-        <section class="post-feed" id="post-feed">
-           
-        </section>
-    </main>
-
-      <!-- ✅ Loader -->
     <div id="loader" class="loader-overlay" style="display: none;">
         <div class="spinner"></div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
- <script src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>

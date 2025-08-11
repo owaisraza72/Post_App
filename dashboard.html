@@ -1,22 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Post App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- Navbar -->
     <header>
         <nav>
-            <div class="logo">Post App</div>
-            <div class="user-info">
-                <span id="userName">John Doe</span>
-                <button id="logoutBtn" class="logout-btn">Logout</button>
+            <div class="nav-left">
+                <div class="logo">
+                    <i class="fas fa-pen-nib"></i>
+                    <span>PostApp</span>
+                </div>
+
+                <!-- Added Home Button -->
+            </div>
+
+            <div class="nav-right">
+                <a href="post.html" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search...">
+                </div>
+                <button class="create-btn">
+                    <i class="fas fa-plus"></i>
+                    <span>Create</span>
+                </button>
+
+                <div class="notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">5</span>
+                </div>
+
+                <div class="user-profile">
+                    <div class="avatar">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User" id="userAvatar">
+                    </div>
+                    <span class="username" id="userName">John Doe</span>
+                    <i class="fas fa-chevron-down"></i>
+
+                    <div class="dropdown-menu">
+                        <a href=""><i class="fas fa-user"></i> Profile</a>
+                        <a href="#"><i class="fas fa-cog"></i> Settings</a>
+                        <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -24,26 +63,87 @@
     <!-- Dashboard -->
     <main>
         <div class="dashboard-container">
-            <button id="createPostBtn" class="create-post-btn">Create Post</button>
+            <!-- User Profile Section -->
+            <div id="userDetails" class="user-profile-card">
+                <div class="profile-header">
+                    <div class="avatar-container">
+                        <img id="profilePicture" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png"
+                            alt="Profile Picture" class="profile-avatar">
 
-            <!-- Form to create post -->
-            <div id="postForm" class="post-form hidden">
-                <input type="file" id="image">
-                <input type="text" id="postTitle" placeholder="Enter post title" class="input-field">
-                <textarea id="postContent" placeholder="Enter post content" class="input-field"></textarea>
-                <button id="submitPostBtn" class="submit-post-btn">Submit Post</button>
-            </div>
-
-            <!-- Post Section -->
-            <section id="postSection" class="post-section">
-                <h3>Your Posts</h3>
-                <div id="postsContainer" class="posts-container">
-                    <!-- Dynamically created posts will appear here -->
+                        <button class="edit-btn edit-avatar" title="Edit Profile Picture" id="editLogo">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profileName">Loading...
+                            <button class="edit-btn edit-name" title="Edit Name">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </h2>
+                        <p class="profile-bio" id="profileBio">No bio yet.
+                            <button class="edit-btn edit-bio" title="Edit Bio">
+                                <i class="fas fa-pencil-alt"></i>
+                            </button>
+                        </p>
+                    </div>
                 </div>
-            </section>
+
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="postCount">0</span>
+                        <span class="stat-label">Posts</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="followerCount">0</span>
+                        <span class="stat-label">Followers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="followingCount">0</span>
+                        <span class="stat-label">Following</span>
+                    </div>
+                </div>
+
+
+                <div class="profile-actions">
+                    <button id="createPostBtn" class="edit-profile-btn">
+                        <i class="fas fa-plus"></i> Upload Post
+                    </button>
+                    <button class="edit-profile-btn">
+                        <i class="fas fa-user-edit"></i> Edit Profile
+                    </button>
+
+                    <button id="createPostBtn" class="edit-profile-btn">
+                        <i class="fas fa-plus"></i> Upload Reels
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Form to create post -->
+        <div id="postForm" class="post-form hidden">
+            <label for="image" class="file-upload-label">
+                <i class="fas fa-image"></i> Choose an image
+                <input type="file" id="image" accept="image/*">
+            </label>
+            <input type="text" id="postTitle" placeholder="Enter post title" class="input-field">
+            <textarea id="postContent" placeholder="Share your thoughts..." class="input-field"></textarea>
+            <button id="submitPostBtn" class="submit-post-btn">
+                <i class="fas fa-paper-plane"></i> Post
+            </button>
+        </div>
+
+        <!-- Post Section -->
+        <section id="postSection" class="post-section">
+            <h3><i class="fas fa-clipboard-list"></i> Your Posts</h3>
+            <div id="postsContainer" class="posts-container">
+                <!-- Dynamically created posts will appear here -->
+            </div>
+        </section>
         </div>
     </main>
-  <!-- ✅ Loader -->
+
+    <!-- Loader -->
     <div id="loader" class="loader-overlay" style="display: none;">
         <div class="spinner"></div>
     </div>
@@ -51,4 +151,5 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
 </body>
+
 </html>
