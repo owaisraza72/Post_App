@@ -284,25 +284,27 @@ async function fetchLogo() {
   let logo = userData.logo_file;
   // let defaultLogo = document.getElementById("defaultLogo").style.display = "block";
 
-  const userAvatar = document.getElementById("userAvatar");
+  // frontend image changed
+  const logoImg = document.getElementById("profilePicture");
+  logoImg ? (logoImg.src = logo) : console.log(logo);
+ 
+ 
   if (logo) {
     defaultLogo.style.display = "none";
   }
   else {
     defaultLogo.style.display = "block";
 
-    userAvatar.innerHTML = `<img src="${logo}">`
   }
+  const userAvatar = document.getElementById("userAvatar");
 
-
+  if (userAvatar) {
+    userAvatar.innerHTML = `<img src="${logo}">`
+  } else {
+    console.log("error");
+  }
   console.log(userAvatar);
 }
-// frontend image changed
-const logoImg = document.getElementById("profilePicture");
-logoImg ? (logoImg.src = logo) : console.log(logo);
-
-
-
 
 fetchLogo();
 
