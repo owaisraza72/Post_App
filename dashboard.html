@@ -44,15 +44,14 @@
                 </div>
 
                 <div class="user-profile">
-                    <div class="avatar" id="userAvatar">
-                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User" id="defaultLogo"  >
+                    <div class="avatar">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="User" id="userAvatar">
                     </div>
-
                     <span class="username" id="userName">John Doe</span>
                     <i class="fas fa-chevron-down"></i>
 
                     <div class="dropdown-menu">
-                        <a href="#"><i class="fas fa-user"></i> Profile</a>
+                        <a href=""><i class="fas fa-user"></i> Profile</a>
                         <a href="#"><i class="fas fa-cog"></i> Settings</a>
                         <a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
@@ -81,7 +80,9 @@
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
                         </h2>
-                        <p class="profile-bio" id="profileBio">No bio yet.
+
+                        <p class="profile-bio" id="profileBio">
+                            No bio yet.
                             <button class="edit-btn edit-bio" title="Edit Bio">
                                 <i class="fas fa-pencil-alt"></i>
                             </button>
@@ -134,18 +135,22 @@
             </button>
         </div>
 
+
         <!-- Post Section -->
         <section id="postSection" class="post-section">
             <h3><i class="fas fa-clipboard-list"></i> Your Posts</h3>
             <div id="postsContainer" class="posts-container">
+               
                 <!-- Dynamically created posts will appear here -->
             </div>
         </section>
         </div>
+        
     </main>
 
     <!-- Loader -->
     <div id="loader" class="loader-overlay" style="display: none;">
+         
         <div class="spinner"></div>
     </div>
 

@@ -63,8 +63,7 @@ if (signupform) {
     if (insertError) {
       Swal.fire("Error", insertError.message, "error");
       return;
-    }
-    else {
+    } else {
       Swal.fire(
         "Success! Signed up ",
         "You have signed up successfully! Please check your Email"
@@ -73,14 +72,12 @@ if (signupform) {
       username.value = "";
       useremail.value = "";
       userpassword.value = "";
-
-      loginPage()
+      loginPage();
     }
+
     // After everything
     hideLoader(); //  Hide loader
-
   });
-
 }
 // ======================================= Login Handler ======================================================================
 if (loginform) {
@@ -114,10 +111,8 @@ function hideLoader() {
 }
 
 function loginPage() {
-  window.location.href = "index.html"
+  window.location.href = "index.html";
 }
-
-
 
 // ======================================= Logout Handler =====================================================================
 
@@ -200,7 +195,7 @@ async function userProfile() {
 }
 
 // Call the function when page loads
-document.addEventListener("DOMContentLoaded", userProfile);
+window.addEventListener("DOMContentLoaded", userProfile);
 
 // ========================================== Supabase editLogo =============================================
 
@@ -227,8 +222,9 @@ if (editLogo) {
         return;
       }
 
-      const fileName = `profileLogo/${session.user.id}-${Date.now()}-${file.name
-        }`;
+      const fileName = `profileLogo/${session.user.id}-${Date.now()}-${
+        file.name
+      }`;
 
       const { error: uploadError } = await client.storage
         .from("postapp")
@@ -270,7 +266,7 @@ async function fetchLogo() {
     return;
   }
   // Get user details from Instagram table
-  const { data: userData, error: userError } = await client
+  const { data, error: userError } = await client
     .from("Instagram")
     .select("*")
     .eq("email", session.user.email)
@@ -281,29 +277,19 @@ async function fetchLogo() {
     return;
   }
 
-  let logo = userData.logo_file;
-  // let defaultLogo = document.getElementById("defaultLogo").style.display = "block";
+  let logo = data.logo_file;
 
   // frontend image changed
   const logoImg = document.getElementById("profilePicture");
   logoImg ? (logoImg.src = logo) : console.log(logo);
- 
- 
-  if (logo) {
-    defaultLogo.style.display = "none";
-  }
-  else {
-    defaultLogo.style.display = "block";
 
-  }
   const userAvatar = document.getElementById("userAvatar");
-
   if (userAvatar) {
-    userAvatar.innerHTML = `<img src="${logo}">`
+    userAvatar.src = logo;
   } else {
     console.log("error");
   }
-  console.log(userAvatar);
+  // console.log(userAvatar);
 }
 
 fetchLogo();
@@ -392,38 +378,228 @@ async function show() {
   }
 
   postShow.innerHTML = ""; // Clear old posts
-
   updatData.forEach((element) => {
     postShow.innerHTML += `
       <div class="post-card">
         <img src="${element.file}" alt="Post Image">
-        <h3>${element.post_title}</h3>
-        <p>${element.post_content}</p>
-        <span>Posted by: ${element.email}</span>
+        <div class="post-card-content">
+            <h4>${element.post_title}</h4>
+            <p>${element.post_content}</p>
+            
+            <div class="post-footer">
+                <!-- Like Button -->
+                <button class="like-btn">
+                    <i class="far fa-heart"></i> Like
+                </button>
+                
+                <!-- 3-dots Menu -->
+                <div class="post-actions">
+                    <button class="post-menu-btn">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="post-dropdown">
+                        <button class="update-btn"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
       </div>`;
   });
+  likePost();
 }
+
+window.addEventListener("DOMContentLoaded", () => {
+  show();
+});       
+async function deletePost() {
+  const {
+    data: { session },
+    error,
+  } = await client.auth.getSession();
+
+  if (error) {
+    console.error("Error getting session:", error.message);
+    return;
+  }
+  const response = await client
+    .from("post_app")
+    .delete()
+    .eq("email", session.user.email);
+
+}
+
+// .addEventListener("DOMContentLoaded", deletePost);
+
+document.addEventListener("click", function (e) {
+  const action = e.target.closest(".post-actions");
+
+  // Remove active from all menus
+  document.querySelectorAll(".post-actions").forEach((menu) => {
+    if (menu !== action) menu.classList.remove("active");
+  });
+
+  // Toggle active if clicked on the button
+  if (action && e.target.closest(".post-menu-btn")) {
+    action.classList.toggle("active");
+  }
+});
+
+
+function likePost() {
+  /// Like button functionality with count
+  document.querySelectorAll(".like-btn").forEach((btn) => {
+    // Initialize count (you can load actual counts from your database here)
+    let count = 0;
+    localStorage.setItem("like", JSON.stringify(count));
+    const countSpan = document.createElement("span");
+    countSpan.className = "like-count";
+    countSpan.textContent = count;
+    btn.appendChild(countSpan);
+
+    btn.addEventListener("click", async ()=> {
+      const icon = this.querySelector("i");
+      this.classList.toggle("liked");
+      icon.classList.toggle("far");
+      icon.classList.toggle("fas");
+
+      // Update count
+      if (this.classList.contains("liked")) {
+        count++;
+      } else {
+        count--;
+      }
+      countSpan.textContent = count;
+      console.log(count)
+
+      
+    });
+  });
+}
+
 show();
+
+// --- Page load par bio fetch karo ---
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    const {
+      data: { session },
+    } = await client.auth.getSession();
+
+    if (session) {
+      const { data, error } = await client
+        .from("Instagram")
+        .select("bio")
+        .eq("email", session.user.email)
+        .single();
+
+      if (!error && data?.bio) {
+        document.getElementById("profileBio").childNodes[0].textContent =
+          data.bio;
+      }
+    }
+  } catch (err) {
+    console.error("Error loading bio:", err.message);
+  }
+});
+
+// --- Edit Bio Button ---
+let editbio = document.querySelector(".edit-bio");
+
+if (editbio) {
+  editbio.addEventListener("click", async function () {
+    try {
+      let currentBio = document
+        .getElementById("profileBio")
+        .childNodes[0].textContent.trim();
+
+      const { value: newBio } = await Swal.fire({
+        title: "Edit Bio",
+        input: "text",
+        inputLabel: "Write your bio",
+        inputValue: currentBio === "No bio yet." ? "" : currentBio,
+        showCancelButton: true,
+        confirmButtonText: "Save",
+        cancelButtonText: "Cancel",
+        inputPlaceholder: "Enter your bio here...",
+      });
+
+      if (!newBio) return; // Agar empty ya cancel to exit
+
+      const {
+        data: { session },
+        error: sessionError,
+      } = await client.auth.getSession();
+      if (sessionError) throw sessionError;
+
+      const { error: updateError } = await client
+        .from("Instagram")
+        .update({ bio: newBio })
+        .eq("email", session.user.email);
+
+      if (updateError) throw updateError;
+
+      // DOM me update
+      document.getElementById("profileBio").childNodes[0].textContent = newBio;
+
+      Swal.fire({
+        icon: "success",
+        title: "Bio updated!",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } catch (err) {
+      console.error(err);
+      Swal.fire("Error", err.message || "Something went wrong", "error");
+    }
+  });
+}
 
 async function renderPost() {
   const { data: updatData, error: updatError } = await client
     .from("post_app")
     .select("*");
 
-  updatError
-    ? Swal.fire("Error", error.message, "error")
-    : console.log("updatData");
-
+ if( updatError){
+     Swal.fire("Error", error.message, "error")
+return;
+}
   postFeed.innerHTML = ""; // Clear old posts
 
   updatData.forEach((element) => {
     postFeed.innerHTML += `
+                     
      <div class="post-card">
-     <img src="${element.file}" alt="Post Image">
-     <h3>${element.post_title}</h3>
-     <p>${element.post_content}</p>
-     <span>Posted by: ${element.email}</span>
-     </div>`;
+        <img src="${element.file}" alt="Post Image">
+        <div class="post-card-content">
+            <h4>${element.post_title}</h4>
+            <p>${element.post_content}</p>
+            
+            <div class="post-footer">
+                <!-- Like Button -->
+                <button class="like-btn">
+                    <i class="far fa-heart"></i> Like
+                </button>
+                
+                <!-- 3-dots Menu -->
+<div class="post-actions">
+    <button class="post-menu-btn">
+        <i class="fas fa-ellipsis-v"></i>
+    </button>
+    <div class="post-dropdown">
+        <button class="update-btn">
+            <i class="fas fa-share"></i> Share
+        </button>
+        <button class="delete-btn">
+            <i class="fas fa-bookmark"></i> Save
+        </button>
+    </div>
+</div>
+
+            
+</div>`;
   });
+  likePost();
 }
+
 renderPost();

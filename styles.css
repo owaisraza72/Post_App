@@ -1239,3 +1239,184 @@ nav {
 
 /* Font Awesome icons (you'll need to include FA in your project) */
 @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css");
+/* Post card styles */
+/* Post card styles */
+.post-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+  position: relative;
+}
+
+.post-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.post-card-content {
+  padding: 15px;
+  position: relative;
+}
+
+.post-card-content h4 {
+  margin: 0 0 10px;
+  color: #333;
+}
+
+.post-card-content p {
+  margin: 0 0 15px;
+  color: #666;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Like button */
+.like-btn {
+  background: #f0f2f5;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fd3a09;
+}
+
+.like-btn:hover {
+  background: #e4e6e9;
+}
+/* Post card container fix */
+.post-card {
+  position: relative;
+  overflow: visible !important; /* let dropdown show outside */
+  z-index: 1; /* ensure it's above background elements */
+}
+
+
+
+/* Post card container */
+.post-card {
+  position: relative;
+  overflow: visible !important; /* prevent clipping of dropdown */
+  z-index: 1;
+}
+
+/* Post actions at bottom right */
+.post-actions {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  overflow: visible;
+}
+
+/* 3-dot button */
+.post-menu-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #65676b;
+  padding: 8px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.post-menu-btn:hover {
+  background: #f0f2f5;
+}
+
+/* Dropdown menu */
+.post-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px); /* show above button */
+  background: white;
+  min-width: 150px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+/* Show on hover */
+.post-actions:hover .post-dropdown,
+.post-dropdown:hover {
+  display: block;
+}
+
+/* Dropdown buttons */
+.post-dropdown button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #050505;
+  font-size: 14px;
+}
+
+.post-dropdown button:hover {
+  background: #f2f2f2;
+}
+
+/* Button colors */
+.update-btn {
+  color: #1877f2;
+}
+
+.delete-btn {
+  color: #f02849;
+}
+
+.post-dropdown button i {
+  width: 16px;
+  text-align: center;
+}
+
+
+.post-actions {
+    position: relative;
+    display: inline-block;
+}
+
+
+/* Show on hover */
+.post-actions:hover .post-dropdown {
+    display: block;
+}
+
+/* Show when active by click */
+.post-actions.active .post-dropdown {
+    display: block;
+}
+
+.post-dropdown button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    width: 100%;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.post-dropdown button:hover {
+    background: #f0f0f0;
+}
