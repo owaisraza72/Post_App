@@ -222,9 +222,8 @@ if (editLogo) {
         return;
       }
 
-      const fileName = `profileLogo/${session.user.id}-${Date.now()}-${
-        file.name
-      }`;
+      const fileName = `profileLogo/${session.user.id}-${Date.now()}-${file.name
+        }`;
 
       const { error: uploadError } = await client.storage
         .from("postapp")
@@ -291,6 +290,7 @@ async function fetchLogo() {
   }
   // console.log(userAvatar);
 }
+
 
 fetchLogo();
 
@@ -399,37 +399,38 @@ async function show() {
                     </button>
                     <div class="post-dropdown">
                         <button class="update-btn"><i class="fas fa-edit"></i> Edit</button>
-                        <button class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+                        <button class="delete-btn" onclick="deletePost('${element.id}')"><i class="fas fa-trash"></i> Delete</button>
                     </div>
                 </div>
             </div>
         </div>
       </div>`;
+
   });
   likePost();
 }
 
 window.addEventListener("DOMContentLoaded", () => {
   show();
-});       
-async function deletePost() {
-  const {
-    data: { session },
-    error,
-  } = await client.auth.getSession();
+});
+async function deletePost(postId) {
+  console.log(postId);
 
-  if (error) {
-    console.error("Error getting session:", error.message);
-    return;
-  }
-  const response = await client
+  const { error } = await client
     .from("post_app")
     .delete()
-    .eq("email", session.user.email);
+    .eq("id", postId); // Sirf usi post ko delete karo jiska ID match kare
 
+  if (error) {
+    Swal.fire("Error", error.message, "error");
+    return;
+  }
+  Swal.fire("Deleted!", "Post has been deleted.", "success");
+  show(); // Posts ko dobara load karo taake deleted post na dikhe
 }
 
-// .addEventListener("DOMContentLoaded", deletePost);
+
+
 
 document.addEventListener("click", function (e) {
   const action = e.target.closest(".post-actions");
@@ -457,7 +458,7 @@ function likePost() {
     countSpan.textContent = count;
     btn.appendChild(countSpan);
 
-    btn.addEventListener("click", async ()=> {
+    btn.addEventListener("click", function () {
       const icon = this.querySelector("i");
       this.classList.toggle("liked");
       icon.classList.toggle("far");
@@ -472,10 +473,11 @@ function likePost() {
       countSpan.textContent = count;
       console.log(count)
 
-      
+
     });
   });
 }
+
 
 show();
 
@@ -560,10 +562,10 @@ async function renderPost() {
     .from("post_app")
     .select("*");
 
- if( updatError){
-     Swal.fire("Error", error.message, "error")
-return;
-}
+  if (updatError) {
+    Swal.fire("Error", error.message, "error")
+    return;
+  }
   postFeed.innerHTML = ""; // Clear old posts
 
   updatData.forEach((element) => {
